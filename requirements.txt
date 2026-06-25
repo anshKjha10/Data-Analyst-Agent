@@ -19,3 +19,5 @@ reportlab
 tabulate
 tqdm
 scipy
+openai
+langchain_openai
