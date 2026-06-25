@@ -21,3 +21,4 @@ tqdm
 scipy
 openai
 langchain_openai
+boto3
