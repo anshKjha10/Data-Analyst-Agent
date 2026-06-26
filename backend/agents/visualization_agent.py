@@ -44,7 +44,13 @@ class VisualizationAgent:
                 result = plot_chart(df, chart_type, x_col=x_col, y_col=y_col)
 
                 if "saved_path" in result:
-                    visualizations.append(result["saved_path"])
+                    visualizations.append({
+                        "title": task_args.get("title", f"{chart_type}" + (f": {x_col}" if x_col else "") + (f" vs {y_col}" if y_col else "")),
+                        "chart_type": chart_type,
+                        "x_column": x_col,
+                        "y_column": y_col,
+                        "image_url": result["saved_path"]
+                    })
                 elif "error" in result:
                     print(f"Warning: Plot failed for task {action_name}: {result['error']}")
 

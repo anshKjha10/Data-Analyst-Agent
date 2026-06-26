@@ -11,7 +11,7 @@ load_dotenv()
 
 llm = ChatOpenAI(
     api_key = os.getenv("OPENAI_API_KEY"),
-    model_name = "gpt-5",
+    model_name = "GPT-5",
     base_url = "https://models.inference.ai.azure.com",
     temperature = 0
 )

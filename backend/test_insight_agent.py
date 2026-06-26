@@ -32,8 +32,20 @@ def run_test():
             }
         },
         "visualizations": [
-            "reports/histogram_Sales.png",
-            "reports/scatter_plot_Sales_vs_Profit.png"
+            {
+                "title": "Histogram of Sales",
+                "chart_type": "Histogram",
+                "x_column": "Sales",
+                "y_column": None,
+                "image_url": "reports/histogram_Sales.png"
+            },
+            {
+                "title": "Sales vs Profit Scatter",
+                "chart_type": "Scatter Plot",
+                "x_column": "Sales",
+                "y_column": "Profit",
+                "image_url": "reports/scatter_plot_Sales_vs_Profit.png"
+            }
         ]
     }
 

@@ -6,7 +6,7 @@ class DataAnalystState(TypedDict):
     dataset_info: Dict
     analysis_plan: Dict
     eda_results: Dict
-    visualizations: List[str]
+    visualizations: List[Dict]
     insights: List[str]
     report: str 
     review_score: Optional[float]
