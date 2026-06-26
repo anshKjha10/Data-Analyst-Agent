@@ -19,6 +19,5 @@ reportlab
 tabulate
 tqdm
 scipy
-openai
-langchain_openai
+langchain_groq
 boto3

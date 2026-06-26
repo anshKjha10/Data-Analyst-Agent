@@ -25,8 +25,8 @@ Available Agents
 Actions:
 - summary_statistics
 - missing_value_analysis
-- duplicate_analysis
-- skewness_analysis
+- get_duplicate_count
+- get_skewness
 - outlier_detection
 - correlation_analysis
 
@@ -39,12 +39,15 @@ Actions:
 - line_chart
 - bar_chart
 - pie_chart
-- correlation_heatmap
+- heatmap
 
 3. insight_agent
 
 Actions:
-- regenerate_insights
+- business_insights
+- trend_detection
+- anomaly_detection
+- recommendations
 
 Return ONLY valid JSON.
 
@@ -60,9 +63,9 @@ Example:
             "agent":"visualization_agent",
             "action":"line_chart",
 
-            "parameters":{{
-                "x":"Order Date",
-                "y":"Sales"
+            "args":{{
+                "target_columns":["Order Date", "Sales"],
+                "title":"Monthly trend of Sales"
             }},
 
             "reason":"Monthly trend was missing."

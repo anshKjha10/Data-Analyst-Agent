@@ -4,12 +4,16 @@ import re
 from dotenv import load_dotenv
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from backend.prompts.planner_prompt import PLANNER_PROMPT
 
 load_dotenv()
 
-llm = ChatOpenAI(api_key = os.getenv("OPENAI_API_KEY"), model_name="GPT-4.1", base_url = "https://models.inference.ai.azure.com")
+llm = ChatGroq(
+    api_key=os.getenv("GROQ_API_KEY"),
+    model_name=os.getenv("GROQ_MODEL_NAME", "llama-3.3-70b-versatile"),
+    temperature=0
+)
 
 class PlannerAgent:
 

@@ -4,15 +4,15 @@ import re
 from dotenv import load_dotenv
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from backend.prompts.reviewer_prompt import REVIEWER_PROMPT
 
 load_dotenv()
 
-llm = ChatOpenAI(
-    model_name="GPT-4",
-    api_key=os.getenv("OPENAI_API_KEY"),
-    base_url="https://models.inference.ai.azure.com"
+llm = ChatGroq(
+    api_key=os.getenv("GROQ_API_KEY"),
+    model_name="llama-3.3-70b-versatile",
+    temperature=0
 )
 
 class ReviewerAgent:

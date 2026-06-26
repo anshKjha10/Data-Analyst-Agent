@@ -5,7 +5,7 @@ import json
 # Ensure project root is on sys.path so backend can be imported
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from backend.agents.dataset_agent import dataset_agent
+from backend.agents.dataset_agent import DatasetAgent
 from backend.agents.planner_agent import PlannerAgent
 
 def run_test():
@@ -19,7 +19,7 @@ def run_test():
     # 1. Initialize dataset state
     state = {"file_path": file_path}
     print("Extracting dataset info...")
-    dataset_state = dataset_agent(state)
+    dataset_state = DatasetAgent().run(state)
     state.update(dataset_state)
 
     # 2. Instantiate PlannerAgent
