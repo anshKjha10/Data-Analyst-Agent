@@ -1,9 +1,16 @@
 import os
+import matplotlib
+matplotlib.use('Agg')          # non-interactive backend — safe to use from threads
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pandas as pd
 import io
 from backend.tools.s3_uploader import is_s3_configured, upload_image_buffer_to_s3
+
+# Apply a clean dark style for all charts
+plt.style.use('dark_background')
+sns.set_theme(style="darkgrid", palette="muted")
+
 
 def plot_chart(df, chart_type, x_col=None, y_col=None, save_dir="reports", filename=None):
     """

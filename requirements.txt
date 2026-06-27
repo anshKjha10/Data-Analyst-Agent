@@ -4,7 +4,6 @@ openpyxl
 matplotlib
 seaborn
 plotly
-streamlit
 langchain
 langgraph
 langchain-community
@@ -13,11 +12,11 @@ langchain-google-genai
 langchain-groq
 python-dotenv
 faiss-cpu
-fastapi
-uvicorn
 reportlab
 tabulate
 tqdm
 scipy
 langchain_groq
 boto3
+flask
+flask-cors

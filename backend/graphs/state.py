@@ -11,3 +11,5 @@ class DataAnalystState(TypedDict):
     report: str 
     review_score: Optional[float]
     feedback: Optional[str]
+    review: Optional[Dict]
+    review_passed: Optional[bool]

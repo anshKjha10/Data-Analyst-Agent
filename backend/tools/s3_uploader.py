@@ -42,8 +42,12 @@ def upload_image_buffer_to_s3(buffer, filename, content_type="image/png"):
             ContentType=content_type
         )
         
-        public_url = f"https://{bucket_name}.s3.{region}.amazonaws.com/{filename}"
-        return public_url
+        presigned_url = s3_client.generate_presigned_url(
+            'get_object',
+            Params={'Bucket': bucket_name, 'Key': filename},
+            ExpiresIn=43200 # 12 hours
+        )
+        return presigned_url
 
     except ClientError as e:
         print(f"Error uploading file to S3: {e}")
