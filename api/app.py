@@ -69,7 +69,6 @@ def _run_pipeline(job_id: str, tmp_path: str, query: str, filename: str):
             img_path = viz.get("image_url", "")
             if img_path:
                 if img_path.startswith("http://") or img_path.startswith("https://"):
-                    # Already a public URL (e.g., S3), keep it as is
                     viz["image_url"] = img_path
                     viz["image_abs"] = img_path
                 else:
@@ -78,11 +77,9 @@ def _run_pipeline(job_id: str, tmp_path: str, query: str, filename: str):
                         viz["image_url"] = f"/api/images/{os.path.basename(abs_path)}"
                         viz["image_abs"] = abs_path
                     else:
-                        # Fallback if path doesn't exist but has a filename
                         viz["image_url"] = f"/api/images/{os.path.basename(img_path)}"
                         viz["image_abs"] = abs_path
 
-        # Rewrite relative image paths in the markdown report text (ignoring full HTTP/HTTPS URLs)
         report = result.get("report", "")
         if report:
             import re
