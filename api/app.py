@@ -2,6 +2,7 @@ import os
 import sys
 import json
 import uuid
+import sqlite3
 import tempfile
 import threading
 from pathlib import Path
@@ -19,7 +20,33 @@ load_dotenv(os.path.join(ROOT, ".env"))
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"])
 
-_history = []
+DB_PATH = os.path.join(ROOT, "history.db")
+
+def _get_conn():
+    """Open a SQLite connection with thread-safe settings."""
+    con = sqlite3.connect(DB_PATH, check_same_thread=False)
+    con.row_factory = sqlite3.Row
+    return con
+
+def _init_db():
+    """Create the history table if it doesn't exist yet."""
+    con = _get_conn()
+    con.execute("""
+        CREATE TABLE IF NOT EXISTS history (
+            id         TEXT PRIMARY KEY,
+            user_id    TEXT NOT NULL DEFAULT 'anonymous',
+            file       TEXT,
+            query      TEXT,
+            score      REAL,
+            passed     INTEGER,
+            result     TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    con.commit()
+    con.close()
+
+_init_db()
 
 _jobs: dict[str, dict] = {}
 
@@ -91,14 +118,23 @@ def _run_pipeline(job_id: str, tmp_path: str, query: str, filename: str):
         _jobs[job_id]["step"] = len(PIPELINE_STEPS)
         _jobs[job_id]["result"] = result
 
-        _history.append({
-            "id": job_id,
-            "file": filename,
-            "query": query,
-            "score": result.get("review_score") or 0,
-            "passed": result.get("review_passed", False),
-            "result": result,
-        })
+        user_id = _jobs[job_id].get("user_id", "anonymous")
+        con = _get_conn()
+        con.execute(
+            "INSERT OR REPLACE INTO history (id, user_id, file, query, score, passed, result) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (
+                job_id,
+                user_id,
+                filename,
+                query,
+                result.get("review_score") or 0,
+                int(bool(result.get("review_passed", False))),
+                json.dumps(result),
+            )
+        )
+        con.commit()
+        con.close()
 
     except Exception as e:
         _jobs[job_id]["status"] = "error"
@@ -135,10 +171,12 @@ def analyze():
         tmp_path = tmp.name
 
     job_id = str(uuid.uuid4())
+    user_id = request.form.get("user_id", "anonymous")
     _jobs[job_id] = {
         "status": "running",
         "step": 0,
         "step_label": PIPELINE_STEPS[0],
+        "user_id": user_id,
         "result": None,
         "error": None,
     }
@@ -172,25 +210,35 @@ def job_status(job_id):
 
 @app.route("/api/history", methods=["GET"])
 def history():
-    """Return session history (without heavy result payloads)."""
-    light = []
-    for entry in _history:
-        light.append({
-            "id": entry["id"],
-            "file": entry["file"],
-            "query": entry["query"],
-            "score": entry["score"],
-            "passed": entry["passed"],
-        })
-    return jsonify(light)
+    """Return history for this user (no heavy result payload)."""
+    user_id = request.args.get("user_id", "anonymous")
+    con = _get_conn()
+    rows = con.execute(
+        "SELECT id, file, query, score, passed FROM history "
+        "WHERE user_id = ? ORDER BY created_at DESC",
+        (user_id,)
+    ).fetchall()
+    con.close()
+    return jsonify([
+        {
+            "id": r["id"],
+            "file": r["file"],
+            "query": r["query"],
+            "score": r["score"],
+            "passed": bool(r["passed"]),
+        }
+        for r in rows
+    ])
 
 
 @app.route("/api/history/<job_id>", methods=["GET"])
 def history_detail(job_id):
     """Return full result for a specific history entry."""
-    for entry in _history:
-        if entry["id"] == job_id:
-            return jsonify(entry)
+    con = _get_conn()
+    row = con.execute("SELECT result FROM history WHERE id = ?", (job_id,)).fetchone()
+    con.close()
+    if row:
+        return jsonify({"result": json.loads(row["result"])})
     return jsonify({"error": "Not found"}), 404
 
 

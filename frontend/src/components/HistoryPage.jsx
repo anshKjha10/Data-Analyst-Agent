@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import ResultTabs from './ResultTabs'
+import { getUserId } from '../utils/userId'
 
 export default function HistoryPage() {
   const [history, setHistory] = useState([])
@@ -7,7 +8,8 @@ export default function HistoryPage() {
   const [expanded, setExpanded] = useState(null)
 
   useEffect(() => {
-    fetch('/api/history')
+    const uid = getUserId()
+    fetch(`/api/history?user_id=${uid}`)
       .then(res => res.json())
       .then(data => {
         if (Array.isArray(data)) {
@@ -72,7 +74,7 @@ export default function HistoryPage() {
     <div>
       <div style={{ marginBottom: '1.5rem' }}>
         <h2 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>Analysis History</h2>
-        <p>{history.length} run{history.length !== 1 ? 's' : ''} in this session</p>
+        <p>{history.length} run{history.length !== 1 ? 's' : ''} — your history is saved across sessions</p>
       </div>
 
       {history.map((entry, i) => {

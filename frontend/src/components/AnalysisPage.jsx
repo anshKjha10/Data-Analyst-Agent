@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from 'react'
 import PipelineStepper from './PipelineStepper'
 import ResultTabs from './ResultTabs'
+import { getUserId } from '../utils/userId'
 
 const DEFAULT_QUERY = 'Provide a comprehensive analysis of this dataset. Identify key trends, anomalies, correlations, business insights, risks, and actionable recommendations.'
 
@@ -62,6 +63,7 @@ export default function AnalysisPage() {
       const formData = new FormData()
       formData.append('file', file)
       formData.append('query', DEFAULT_QUERY)
+      formData.append('user_id', getUserId())
       const res = await fetch('/api/analyze', { method: 'POST', body: formData })
       const { job_id, error: err } = await res.json()
       if (err) throw new Error(err)
