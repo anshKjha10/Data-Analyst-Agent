@@ -62,6 +62,29 @@ PIPELINE_STEPS = [
 ]
 
 
+def sanitize_json(data):
+    """Recursively replace float('nan'), float('inf'), and float('-inf') with None."""
+    import math
+    if isinstance(data, dict):
+        return {k: sanitize_json(v) for k, v in data.items()}
+    elif isinstance(data, list):
+        return [sanitize_json(v) for v in data]
+    elif isinstance(data, float):
+        if math.isnan(data) or math.isinf(data):
+            return None
+        return data
+    else:
+        try:
+            if hasattr(data, 'dtype') and ('float' in str(data.dtype) or 'double' in str(data.dtype)):
+                val = float(data)
+                if math.isnan(val) or math.isinf(val):
+                    return None
+                return val
+        except Exception:
+            pass
+        return data
+
+
 def _run_pipeline(job_id: str, tmp_path: str, query: str, filename: str):
     """Run the full LangGraph pipeline in a background thread."""
     try:
@@ -90,6 +113,7 @@ def _run_pipeline(job_id: str, tmp_path: str, query: str, filename: str):
         }
 
         result = analyst_pipeline.invoke(initial_state)
+        result = sanitize_json(result)
 
  
         for viz in result.get("visualizations", []):
