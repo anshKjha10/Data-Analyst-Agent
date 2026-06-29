@@ -18,7 +18,7 @@ from dotenv import load_dotenv
 load_dotenv(os.path.join(ROOT, ".env"))
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:5173", "http://127.0.0.1:5173", "http://localhost:5174", "http://127.0.0.1:5174"])
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 DB_PATH = os.path.join(ROOT, "history.db")
 
