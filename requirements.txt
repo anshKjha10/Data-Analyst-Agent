@@ -20,4 +20,5 @@ langchain_groq
 boto3
 flask
 flask-cors
-gunicorn
+gunicorn
+langsmith
