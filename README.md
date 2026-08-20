@@ -120,7 +120,7 @@ Create a `.env` file in the root directory (refer to `.env.example`):
 
 ```env
 GROQ_API_KEY=your_groq_api_key_here
-GROQ_MODEL_NAME=llama-3.3-70b-versatile
+GROQ_MODEL_NAME=openai/gpt-oss-120b
 
 # Optional AWS S3 Configuration
 AWS_ACCESS_KEY_ID=your_access_key
