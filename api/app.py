@@ -88,14 +88,14 @@ def sanitize_json(data):
 def _run_pipeline(job_id: str, tmp_path: str, query: str, filename: str):
     """Run the full LangGraph pipeline in a background thread."""
     try:
-        from backend.graphs.analyst_graph import complete as analyst_pipeline
+        from backend.graphs.analyst_graph import complete as analyst_pipeline, set_step_callback
 
-        for i, step in enumerate(PIPELINE_STEPS):
-            _jobs[job_id]["step"] = i
-            _jobs[job_id]["step_label"] = step
+        def _advance(step_idx: int):
+            _jobs[job_id]["step"] = step_idx
+            _jobs[job_id]["step_label"] = PIPELINE_STEPS[step_idx]
 
-        _jobs[job_id]["step"] = 0
-        _jobs[job_id]["step_label"] = PIPELINE_STEPS[0]
+        set_step_callback(_advance)
+        _advance(0)
 
         initial_state = {
             "file_path": tmp_path,

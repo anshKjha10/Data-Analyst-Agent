@@ -27,31 +27,53 @@ reviewer_agent = ReviewerAgent()
 reflection_agent = ReflectionAgent()
 report_agent = ReportAgent()
 
+# Step callback — set by app.py before each pipeline run for real-time progress
+_step_callback = None
+
+def set_step_callback(fn):
+    global _step_callback
+    _step_callback = fn
+
+def _advance(step_idx: int):
+    if _step_callback:
+        try:
+            _step_callback(step_idx)
+        except Exception:
+            pass
+
 def dataset_node(state):
+    _advance(0)
     return dataset_agent.run(state)
 
 def eda_node(state):
+    _advance(2)
     return eda_agent.run(state)
 
 def planner_node(state):
+    _advance(1)
     return planner_agent.run(state)
 
 def visualization_node(state):
+    _advance(3)
     return visualization_agent.run(state)
 
 def insight_node(state):
+    _advance(4)
     return insight_agent.run(state)
 
 def reviewer_node(state):
+    _advance(5)
     return reviewer_agent.run(state)
 
 def reflection_node(state):
+    _advance(6)
     result = reflection_agent.run(state)
     # Increment retry_count so we know how many loops have happened
     result["retry_count"] = state.get("retry_count", 0) + 1
     return result
 
 def report_node(state):
+    _advance(7)
     return report_agent.run(state)
 
 graph = StateGraph(DataAnalystState)
