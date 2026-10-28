@@ -8,8 +8,9 @@ class DataAnalystState(TypedDict):
     eda_results: Dict
     visualizations: List[Dict]
     insights: List[str]
-    report: str 
+    report: str
     review_score: Optional[float]
     feedback: Optional[str]
     review: Optional[Dict]
     review_passed: Optional[bool]
+    retry_count: int  # tracks how many reflection loops have run

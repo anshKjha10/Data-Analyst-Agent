@@ -46,7 +46,10 @@ def reviewer_node(state):
     return reviewer_agent.run(state)
 
 def reflection_node(state):
-    return reflection_agent.run(state)
+    result = reflection_agent.run(state)
+    # Increment retry_count so we know how many loops have happened
+    result["retry_count"] = state.get("retry_count", 0) + 1
+    return result
 
 def report_node(state):
     return report_agent.run(state)
@@ -70,6 +73,9 @@ graph.add_edge("visualization", "insight")
 graph.add_edge("insight", "review")
 
 def review_router(state):
+    # Cap at 1 retry max — after that, always proceed to report
+    if state.get("retry_count", 0) >= 1:
+        return "report"
     if state.get("review_passed", False):
         return "report"
     return "reflection"

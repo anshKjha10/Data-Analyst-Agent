@@ -110,6 +110,7 @@ def _run_pipeline(job_id: str, tmp_path: str, query: str, filename: str):
             "feedback": None,
             "review": None,
             "review_passed": None,
+            "retry_count": 0,
         }
 
         result = analyst_pipeline.invoke(initial_state)
