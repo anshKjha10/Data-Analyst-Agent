@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://data-analyst-agent-r88n.onrender.com/api/:path*"
+      "destination": "https://data-analyst-agent-6hk3.onrender.com/api/:path*"
     }
   ]
 }
