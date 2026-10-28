@@ -214,10 +214,26 @@ def analyze():
 
 @app.route("/api/jobs/<job_id>", methods=["GET"])
 def job_status(job_id):
-    """Poll job status / result."""
+    """Poll job status / result. Falls back to SQLite if job not in memory."""
     job = _jobs.get(job_id)
+
+    # Fallback: check SQLite (job completed before or server restarted)
     if not job:
-        return jsonify({"error": "Job not found"}), 404
+        con = _get_conn()
+        row = con.execute(
+            "SELECT result, file, query FROM history WHERE id = ?", (job_id,)
+        ).fetchone()
+        con.close()
+        if row:
+            return jsonify({
+                "status": "done",
+                "step": len(PIPELINE_STEPS),
+                "step_label": "Complete",
+                "total_steps": len(PIPELINE_STEPS),
+                "result": json.loads(row["result"]),
+            })
+        # Truly not found — server restarted and job never completed
+        return jsonify({"error": "Job not found — server may have restarted. Please try again."}), 404
 
     payload = {
         "status": job["status"],

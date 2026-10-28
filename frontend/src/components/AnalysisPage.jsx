@@ -70,6 +70,15 @@ export default function AnalysisPage() {
       pollRef.current = setInterval(async () => {
         try {
           const poll = await fetch(`/api/jobs/${job_id}`)
+
+          // Server restarted mid-analysis — stop polling immediately
+          if (poll.status === 404) {
+            clearInterval(pollRef.current)
+            setError('The server restarted during analysis. Please try again.')
+            setRunning(false)
+            return
+          }
+
           const data = await poll.json()
           setStep(data.step ?? 0)
           setStepLabel(data.step_label ?? '')
